@@ -5,21 +5,15 @@ const db = require('./data/db');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use(express.urlencoded({extended : true}));
 
-app.get("/index", function(req, res) {
-  res.render('index');
-});
+// router
+const indexRoutes = require('./Routes/indexRoutes');
+const adminRoutes = require('./Routes/adminRoutes');
 
-app.get("/", function(req, res) {
-  db.execute('SELECT * FROM products')
-      .then(result => {
-          console.log(result);
+app.use('/', indexRoutes);
+app.use('/product-kontrol', adminRoutes);
 
-          res.render('index');
-        });
-      })
-      // .catch(err => consele.log(err));
-  
 
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');

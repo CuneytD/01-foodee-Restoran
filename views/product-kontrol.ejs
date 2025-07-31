@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ürün Kontrol Paneli</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .card img {
+      height: 150px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+
+  <div class="container py-5">
+
+    <h2 class="mb-4">Ürün Kontrol Paneli</h2>
+
+    <!-- Yeni Anayemek Ekle -->
+    <div class="card mb-6">
+      <div class="card-header">Yeni Anayemek Ekle</div>
+      <div class="card-body">
+        <form action="/product-kontrol/anayemek-ekle" method="POST" class="row g-3">
+          <div class="col-md-3">
+            <input type="text" name="name" class="form-control" placeholder="Ad" required />
+          </div>
+
+          <div class="col-md-4">
+            <input type="text" name="description" class="form-control" placeholder="Açıklama" />
+          </div>
+
+          <div class="col-md-3">
+            <input type="text" name="imageUrl" class="form-control" placeholder="Resim URL" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="price" class="form-control" placeholder="Fiyat" />
+          </div>
+          <div class="form-check form-check-inline col-mb-3 md-6">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" name="isActive" placeholder="isActive"
+              for="inlineCheckbox1">isActive</label>
+          </div>
+          <div class="form-check form-check-inline col-mb-3 md-6">
+            <input class="form-check-input" name="isHome" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" placeholder="isHome" for="inlineCheckbox1">HomeActive</label>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-success">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Mevcut Anayemekler -->
+    <h3 class="mb-3">Mevcut Anayemekler</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+      <% anayemekler.forEach(item=> { %>
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="/images/<%= item.imageUrl %>" class="card-img-top" alt="<%= item.name %>">
+            <div class="card-body">
+              <h5 class="card-title">
+                <%= item.name %>
+              </h5>
+              <p class="card-text">
+                <%= item.description %>
+              </p>
+              <p class="card-text"><strong>Fiyat:</strong>
+                <%= item.price %>₺
+              </p>
+              <p class="card-text"><small class="text-muted">Anasayfa: <%= item.isHome ? "Evet" : "Hayır" %> | Aktif:
+                    <%= item.isActive ? "Evet" : "Hayır" %></small></p>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+              
+               <!-- Silme Formu -->
+              <form action="/product-kontrol/anayemek/<%= item.id %>/sil" method="POST">
+                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+              </form>
+              <!-- Güncelleme Formu -->
+              <form action="/product-kontrol/anayemek/<%= item.id %>/guncelle" method="POST">
+                <input type="hidden" name="name" value="<%= item.name %>" />
+                <input type="hidden" name="description" value="<%= item.description %>" />
+                <input type="hidden" name="imageUrl" value="<%= item.imageUrl %>" />
+                <input type="hidden" name="price" value="<%= item.price %>" />
+                <input type="hidden" name="isHome" value="<%= item.isHome %>" />
+                <input type="hidden" name="isActive" value="<%= item.isActive %>" />
+              </form>              
+              <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#editModal<%= item.id %>">
+                Güncelle
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Güncelleme Modalı -->
+        <div class="modal fade" id="editModal<%= item.id %>" tabindex="-1"
+          aria-labelledby="editModalLabel<%= item.id %>" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <form action="/product-kontrol/anayemek/<%= item.id %>/guncelle" method="POST">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editModalLabel<%= item.id %>">Anayemek Güncelle</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">Ad</label>
+                    <input type="text" name="name" class="form-control" value="<%= item.name %>" required />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Açıklama</label>
+                    <input type="text" name="description" class="form-control" value="<%= item.description %>" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Resim URL</label>
+                    <input type="text" name="imageUrl" class="form-control" value="<%= item.imageUrl %>" />
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label">Fiyat</label>
+                    <input type="text" name="price" class="form-control" value="<%= item.price %>" />
+                  </div>
+                  <div class="col-md-3 d-flex align-items-center">
+                    <div class="form-check me-3">
+                      <input class="form-check-input" type="checkbox" name="isActive" <%=item.isActive ? 'checked' : ''
+                        %> />
+                      <label class="form-check-label">Aktif</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="isHome" <%=item.isHome ? 'checked' : '' %>
+                      />
+                      <label class="form-check-label">Ana Sayfa</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Kaydet</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% }) %>
+    </div>
+
+
+
+
+
+
+    <!-- icecek ekle -->
+
+    <div class="card mb-5">
+      <div class="card-header">Yeni İçecek Ekle</div>
+      <div class="card-body">
+        <form action="/product-kontrol/icecek-ekle" method="POST" class="row g-3">
+          <div class="col-md-4">
+            <input type="text" name="name" class="form-control" placeholder="Ad" required />
+          </div>
+          <div class="col-md-4">
+            <input type="text" name="description" class="form-control" placeholder="Açıklama" />
+          </div>
+          <div class="col-md-4">
+            <input type="text" name="imageUrl" class="form-control" placeholder="Resim URL" />
+          </div>
+          <div class="col-md-2">
+            <input type="text" name="price" class="form-control" placeholder="Fiyat" />
+          </div>
+          <div class="form-check form-check-inline col-mb-3 md-6">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" name="isActive" placeholder="isActive"
+              for="inlineCheckbox1">isActive</label>
+          </div>
+          <div class="form-check form-check-inline col-mb-3 md-6">
+            <input class="form-check-input" name="isHome" type="checkbox" id="inlineCheckbox1" value="option1">
+            <label class="form-check-label" placeholder="isHome" for="inlineCheckbox1">HomeActive</label>
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-success">Ekle</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Mevcut İçecekler -->
+    <h3 class="mb-3">Mevcut İçecekler</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <% icecekler.forEach(icecek=> { %>
+        <div class="col">
+          <div class="card h-100 shadow-sm">
+            <img src="/images/<%= icecek.imageUrl %>" class="card-img-top" alt="<%= icecek.name %>">
+            <div class="card-body">
+              <h5 class="card-title">
+                <%= icecek.name %>
+              </h5>
+              <p class="card-text">
+                <%= icecek.description %>
+              </p>
+              <p class="card-text"><strong>Fiyat:</strong>
+                <%= icecek.price %>₺
+              </p>
+              <p class="card-text">
+                <small class="text-muted">
+                  Anasayfa: <%= icecek.isHome ? "Evet" : "Hayır" %> | Aktif: <%= icecek.isActive ? "Evet" : "Hayır" %>
+                </small>
+              </p>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between">
+              <!-- Sil Butonu -->
+              <form action="/product-kontrol/icecek/<%= icecek.id %>/sil" method="POST">
+                <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+              </form>
+
+              <!-- Güncelle Butonu -->
+              <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                data-bs-target="#editModal1<%= icecek.id %>">
+                Güncelle
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Güncelleme Modalı -->
+        <div class="modal fade" id="editModal1<%= icecek.id %>" tabindex="-1"
+          aria-labelledby="editModal1Label<%= icecek.id %>" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <form action="/product-kontrol/icecek/<%= icecek.id %>/guncelle" method="POST">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editModal1Label<%= icecek.id %>">İçecek Güncelle</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+
+                <div class="modal-body row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label" for="name<%= icecek.id %>">Ad</label>
+                    <input type="text" name="name" id="name<%= icecek.id %>" class="form-control"
+                      value="<%= icecek.name %>" required />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label" for="desc<%= icecek.id %>">Açıklama</label>
+                    <input type="text" name="description" id="desc<%= icecek.id %>" class="form-control"
+                      value="<%= icecek.description %>" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label" for="img<%= icecek.id %>">Resim URL</label>
+                    <input type="text" name="imageUrl" id="img<%= icecek.id %>" class="form-control"
+                      value="<%= icecek.imageUrl %>" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label" for="price<%= icecek.id %>">Fiyat</label>
+                    <input type="text" name="price" id="price<%= icecek.id %>" class="form-control"
+                      value="<%= icecek.price %>" />
+                  </div>
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="form-check me-3">
+                      <input class="form-check-input" type="checkbox" id="isActive<%= icecek.id %>" name="isActive"
+                        <%=icecek.isActive ? 'checked' : '' %> />
+                      <label class="form-check-label" for="isActive<%= icecek.id %>">Aktif</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="isHome<%= icecek.id %>" name="isHome"
+                        <%=icecek.isHome ? 'checked' : '' %> />
+                      <label class="form-check-label" for="isHome<%= icecek.id %>">Ana Sayfa</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary">Kaydet</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
